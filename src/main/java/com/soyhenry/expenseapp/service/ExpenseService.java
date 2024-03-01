@@ -10,7 +10,7 @@ import java.util.List;
 public interface ExpenseService {
     String createExpense(ExpenseRequestDto expenseRequestDto);
     String updateExpense(Long id, ExpenseRequestDto expenseRequestDto);
-    void deleteExpense(Long id) throws DAOException;
+    boolean deleteExpense(Long id) throws DAOException;
     List<ExpenseResponseDto> getAllExpenses();
     ExpenseResponseDto getExpenseById(Long id);
     MonthlyExpenseSumResponseDto getExpenseSumByMonth(int year, int month);

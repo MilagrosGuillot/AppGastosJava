@@ -42,7 +42,7 @@ class ExpenseAppApplicationTests {
 		List<ExpenseResponseDto> mockResponses = Arrays.asList(
 				new ExpenseResponseDto(1, "Comida", 50.0),
 				new ExpenseResponseDto(2, "Transporte", 30.0)
-				// Puedes agregar más objetos según sea necesario
+
 		);
 
 		// Configurar el comportamiento esperado del servicio
@@ -60,13 +60,13 @@ class ExpenseAppApplicationTests {
 		// Mock del resultado esperado
 		Double mockTotalSum = 150.0;
 
-		// Configurar el comportamiento esperado del servicio
+
 		when(expenseService.getTotalExpenseSum()).thenReturn(mockTotalSum);
 
-		// Llamar al método bajo prueba
+
 		ResponseEntity<Double> responseEntity = expenseController.getTotalExpenseSum();
 
-		// Verificar el resultado
+
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(mockTotalSum, responseEntity.getBody());
 	}
@@ -84,7 +84,7 @@ class ExpenseAppApplicationTests {
 		// Llamar al método bajo prueba
 		ResponseEntity<ExpenseResponseDto> responseEntity = expenseController.getExpenseById(expenseId);
 
-		// Verificar el resultado
+
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(mockExpenseResponse, responseEntity.getBody());
 	}

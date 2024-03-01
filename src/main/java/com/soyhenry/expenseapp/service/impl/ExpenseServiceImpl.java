@@ -6,6 +6,7 @@ import com.soyhenry.expenseapp.dto.response.ExpenseCategoryResponseDto;
 import com.soyhenry.expenseapp.dto.request.ExpenseRequestDto;
 import com.soyhenry.expenseapp.dto.response.ExpenseResponseDto;
 import com.soyhenry.expenseapp.exception.DAOException;
+import com.soyhenry.expenseapp.exception.ResourceNotFoundExcepcion;
 import com.soyhenry.expenseapp.repository.ExpenseRepository;
 import com.soyhenry.expenseapp.service.ExpenseService;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,6 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public String createExpense(ExpenseRequestDto expenseRequestDto) {
-        // Defino un mensaje de éxito por default
         String response = "Se registró el gasto con éxito";
         // Realizo un mapeo del DTO a una entidad para manipular hacia la BD
         Expense expense = mapDtoToExpense(expenseRequestDto);
@@ -43,15 +43,17 @@ public class ExpenseServiceImpl implements ExpenseService {
         Integer responsesUpdated = expenseRepository.updateExpense(id, expense);
         // Si el update de BD no devolvió ningún registro actualizado, entonces devuelvo un mensaje de error
         if (responsesUpdated.equals(0)) {
-            System.out.println("No se actualizó ningún registro con el id " + id);
+            throw new ResourceNotFoundExcepcion("update", "id", id);
         }
         System.out.println("Se actualiza la presentacion id: " + id);
         return response;
     }
 
+
     @Override
-    public void deleteExpense(Long id) throws DAOException {
+    public boolean deleteExpense(Long id) throws DAOException {
         expenseRepository.deleteExpense(id);
+        return false;
     }
     @Override
     public MonthlyExpenseSumResponseDto getExpenseSumByMonth(int year, int month) {
@@ -79,8 +81,6 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public ExpenseResponseDto getExpenseById(Long id) {
         Expense expense = expenseRepository.selectExpenseById(id);
-        // En este caso, estoy ahorrando el uso de una variable temporal
-        // y devolviendo directamente el resultado del método privado
         return mapExpenseToResponseDto(expense);
     }
 
@@ -90,9 +90,6 @@ public class ExpenseServiceImpl implements ExpenseService {
     public List<ExpenseResponseDto> getAllExpenses() {
         List<Expense> expenses = expenseRepository.selectExpenses();
 
-        // En este caso, estoy ahorrando el uso de una variable temporal para la lista
-        // y devolviendo directamente el resultado de la llamada funcional
-        // que colecciona todos los objetos de tipo respuesta, resultado del método mapper
         return expenses.stream()
             .map(this::mapExpenseToResponseDto)
             .collect(Collectors.toList());

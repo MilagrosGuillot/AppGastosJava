@@ -3,8 +3,13 @@ package com.soyhenry.expenseapp.controller;
 import com.soyhenry.expenseapp.dto.response.MonthlyExpenseSumResponseDto;
 import com.soyhenry.expenseapp.dto.request.ExpenseRequestDto;
 import com.soyhenry.expenseapp.dto.response.ExpenseResponseDto;
+import com.soyhenry.expenseapp.exception.BadRequestException;
 import com.soyhenry.expenseapp.exception.DAOException;
+import com.soyhenry.expenseapp.exception.ResourceNotFoundExcepcion;
 import com.soyhenry.expenseapp.service.ExpenseService;
+import jakarta.validation.Valid;
+import lombok.Data;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,49 +38,68 @@ public class ExpenseController {
 
     // El endpoint con POST envía un body definido por las propiedades del dto
     @PostMapping()
-    public ResponseEntity<String> createExpense(@RequestBody ExpenseRequestDto expenseRequestDto) {
-        String response = expenseService.createExpense(expenseRequestDto);
-        System.out.println("ExpenseController: creando un gasto");
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
+    public ResponseEntity<String> createExpense(@RequestBody @Valid ExpenseRequestDto expenseRequestDto) {
+        try {
+            String response = expenseService.createExpense(expenseRequestDto);
+            System.out.println("ExpenseController: creando un gasto");
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(response);
+        } catch (DataAccessException exDt) {
+            throw new BadRequestException(exDt.getMessage());
+        }
     }
+
 
     // El endpoint con PUT envía un body definido por las propiedades del dto para actualizar el gasto con id especificado por parametro
     @PutMapping("/update")
     public ResponseEntity<String> updateExpense(@RequestParam Long id,
-                                                @RequestBody ExpenseRequestDto expenseRequestDto) {
-        String response = expenseService.updateExpense(id, expenseRequestDto);
-        System.out.println("ExpenseController: actualizando el gasto");
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body(response);
+                                                @RequestBody @Valid ExpenseRequestDto expenseRequestDto) {
+
+            String response = expenseService.updateExpense(id, expenseRequestDto);
+            System.out.println("ExpenseController: actualizando el gasto");
+
+            return ResponseEntity
+                    .status(HttpStatus.ACCEPTED)
+                    .body(response);
     }
 
     // El endpoint DELETE eliminará un gasto con el id especificado por path
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteExpense(@PathVariable Long id) throws DAOException {
-        expenseService.deleteExpense(id);
+        boolean deleted = expenseService.deleteExpense(id);
         System.out.println("ExpenseController: eliminando el gasto");
+        if (!deleted) {
+            throw new ResourceNotFoundExcepcion("expense", "id", id);
+        }
         return ResponseEntity
                 .status(HttpStatus.GONE)
                 .body("Se eliminó el gasto con id: " + id);
     }
 
+
     // El endpoint GET con id definido en path recuperará un gasto especificado
     @GetMapping("/{id}")
     public ResponseEntity<ExpenseResponseDto> getExpenseById(@PathVariable Long id) {
         ExpenseResponseDto expenseResponseDto = expenseService.getExpenseById(id);
+        if (expenseResponseDto == null) {
+            throw new ResourceNotFoundExcepcion("expense", "id", id);
+        }
         System.out.println("ExpenseController: obteniendo el gasto con id: " + id);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(expenseResponseDto);
     }
 
+
+
     // El endpoint GET sin path ni parametro recuperará todos los gastos de la BD
     @GetMapping()
     public ResponseEntity<List<ExpenseResponseDto>> getExpenses() {
         List<ExpenseResponseDto> responses = expenseService.getAllExpenses();
+        if(responses == null || responses.isEmpty()){
+            throw new ResourceNotFoundExcepcion("expense");
+        }
         System.out.println("ExpenseController: obteniendo todos los gastos");
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -120,7 +144,7 @@ public class ExpenseController {
                 .status(HttpStatus.OK)
                 .body(categoryNames);
     }
-    @GetMapping("/{name}")
+    @GetMapping("/category/{name}")
     public ResponseEntity<Double> getExpensesByCategoryName(@PathVariable String name) {
         Double expenseResponseDtos = expenseService.getExpensesByCategoryName(name);
         System.out.println("ExpenseController: obteniendo gastos con categoría: " + name);

@@ -1,8 +1,14 @@
 package com.soyhenry.expenseapp.dto.request;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 public class ExpenseRequestDto {
+    @NotNull(message = "Monto requerido")
     private Double amount;
+
     private ExpenseCategoryRequestDto categoryDto;
+    @NotEmpty(message = "Fecha requerida")
     private String date;
 
     public ExpenseRequestDto() {

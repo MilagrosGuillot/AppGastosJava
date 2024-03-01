@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 @Repository
 public class ExpenseRepositoryImpl implements ExpenseRepository {
-    // Aglomero todas las sentencias SQL en constantes
     private static final String UPDATE_EXPENSE_BY_ID = "UPDATE Expense SET amount = ?, category_name = ?, date = ? WHERE id = ?";
     private static final String INSERT_INTO_EXPENSE = "INSERT INTO Expense (amount, category_id, category_name, date) VALUES (?, ?, ?, ?)";
     private static final String DELETE_FROM_EXPENSE_BY_ID = "DELETE FROM Expense WHERE id = ?";
@@ -114,31 +113,34 @@ public class ExpenseRepositoryImpl implements ExpenseRepository {
         return jdbcTemplate.queryForObject(
             SELECT_EXPENSE_BY_ID,
             params, types,
-            // Le definimos como debe mapear cada campo recuperado de BD en las propiedades correspondientes de la entidad
             new ExpenseRowMapper());
     }
 
     @Override
     public MonthlyExpenseSumResponseDto selectExpenseSumByMonth(int year, int month) {
-
+        // Consulta SQL para obtener los montos y fechas de gastos
         String sql = "SELECT amount, date FROM Expense WHERE date IS NOT NULL";
 
-        // Realizamos la consulta y obtenemos una lista de objetos Object[]
+        // Ejecución de la consulta y obtención de los resultados
         List<Object[]> result = jdbcTemplate.query(sql, (rs, rowNum) -> new Object[]{rs.getDouble("amount"), rs.getString("date")});
 
+        // Filtrado de gastos por año y mes
         List<Double> filteredExpenses = result.stream()
                 .filter(obj -> {
-                    String expenseDate = (String) obj[1];
-                    LocalDate expenseLocalDate = LocalDate.parse(expenseDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                    return expenseLocalDate.getYear() == year && expenseLocalDate.getMonthValue() == month;
+                    String expenseDate = (String) obj[1]; // Obtiene la fecha como String
+                    LocalDate expenseLocalDate = LocalDate.parse(expenseDate, DateTimeFormatter.ofPattern("dd/MM/yyyy")); // Convierte la fecha a LocalDate
+                    return expenseLocalDate.getYear() == year && expenseLocalDate.getMonthValue() == month; // Compara el año y mes
                 })
-                .map(obj -> (Double) obj[0])
-                .collect(Collectors.toList());
+                .map(obj -> (Double) obj[0]) // Obtiene solo el monto del gasto
+                .collect(Collectors.toList()); // Convierte los resultados filtrados a una lista
 
+        // Cálculo de la suma total de gastos
         double totalAmount = filteredExpenses.stream().mapToDouble(Double::doubleValue).sum();
 
+        // Retorna un nuevo objeto MonthlyExpenseSumResponseDto con la suma total de gastos para el año y mes proporcionados
         return new MonthlyExpenseSumResponseDto(year, month, totalAmount);
     }
+
 
     @Override
     public Double getTotalExpenseSum() {
