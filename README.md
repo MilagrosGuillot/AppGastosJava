@@ -3,11 +3,31 @@ La arquitectura de la aplicación sigue un enfoque de tres capas, que abarca los
 Este último hace uso del patrón JDBC template para facilitar el acceso a la base de datos y la manipulación de los datos relacionados con los gastos y categorías.
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Para obtener el total de gastos de un mes especifico
-http://localhost:8080/api/v1/expense/sum-by-month?year=2023&month=11
+📍 GET | /api/v1/expense/{id}
+   - Obtiene un gasto por ID
 
-Para obtener el total de gastos de todo los meses
-http://localhost:8080/api/v1/expense/total-sum
+📍 GET | /api/v1/expense
+   - Obtiene todos los gastos
 
-Para obtener todas las categorias
-http://localhost:8080/api/v1/expense/categories
+📍 GET | /api/v1/expense/sum-by-month
+   - Obtiene la suma de gastos de un mes y un año especifico
+
+📍 GET | /api/v1/expense/total-sum
+   - Obtiene la suma total de gastos
+
+📍 GET | /api/v1/expense/categories
+   - Obtiene todas las categorías de gastos
+     
+📍 GET | /api/v1/expense/{name}
+   - Obtiene los gastos por categoría
+
+📍 POST | /api/v1/expense
+   - Crea un nuevo gasto
+
+📍 PUT | /api/v1/expense/update
+   - Actualiza un gasto existente
+
+📍 DELETE | /api/v1/expense/{id}
+   - Elimina un gasto existente
+
+
