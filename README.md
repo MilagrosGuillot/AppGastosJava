@@ -5,6 +5,36 @@ Este último hace uso del patrón JDBC template para facilitar el acceso a la ba
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------
 
+
+### Listado de Entidades
+- **expenses** (ED)
+    - expense_id **(PK)**
+    - amount
+    - category_id **(FK)**
+    - categoryName
+    - date
+
+
+
+- **expenseCategory (EC)**
+    - category_id **(PK)**
+    - name
+
+
+### Relaciones
+1. Un **expense** _pertenece_ a una **expenseCategory** (1 a 1).
+
+### Diagramas
+
+### Modelo Entidad - Relacion
+![Modelo Entidad - Relacion](./ExpensesModeloRelacional.drawio.png)
+
+### Modelo Relacional de la BD
+![Modelo Relacional de la BD](./ExpenseModeloEntidadRelacion.drawio.png)
+
+
+### ENDPOINTS
+
 📍 GET | /api/v1/expense/{id}
    - Obtiene un gasto por ID
 
