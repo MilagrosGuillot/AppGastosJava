@@ -27,10 +27,10 @@ Este último hace uso del patrón JDBC template para facilitar el acceso a la ba
 ### Diagramas
 
 ### Modelo Entidad - Relacion
-![Modelo Entidad - Relacion](./ExpensesModeloRelacional.drawio.png)
+![Modelo Entidad - Relacion](./ExpenseModeloEntidadRelacion.drawio.png)
 
 ### Modelo Relacional de la BD
-![Modelo Relacional de la BD](./ExpenseModeloEntidadRelacion.drawio.png)
+![Modelo Relacional de la BD](./ExpensesModeloRelacional.drawio.png)
 
 
 ### ENDPOINTS
